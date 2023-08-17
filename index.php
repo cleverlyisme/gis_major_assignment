@@ -11,6 +11,7 @@
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css" />
     <script src="https://openlayers.org/en/v4.6.5/build/ol.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js" type="text/javascript"></script>
     <link rel="shortcut icon" href="./logo.png" type="image/x-icon">
 </head>
 
@@ -27,7 +28,7 @@
                 <div>
                     <div>
                         <div class=" container-fluid">
-                            <div class="row g-5 mt-4">
+                            <div class="row g-5 mt-1">
                                 <div class=" col-lg-9">
                                     <div class="border border-1 rounded p-2">
                                         <h2 class="text-center">Bản đồ thành phố Hà Nội</h2>
@@ -37,26 +38,34 @@
                                 <div class="col-lg-3 border border-1 rounded ">
                                     <div style="margin-top:150px;">
                                         <div class="mb-3">
-                                            <label for="startPosition" class="form-label">Click chuột lên bản đồ để chọn vị trí bắt đầu: </label>
+                                            <p class="d-inline">Vị trí đang ở: </p>
+                                            <img src="./start.png" alt="Start">
+                                        </div>
+                                        <div class="mb-3">
+                                            <p class="d-inline">Ngân hàng gần nhất: </p>
+                                            <img src="./destination.png" alt="Destination">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="startPosition" class="form-label">Click chuột lên bản đồ để chọn vị trí bạn đang ở: </label>
                                             <input type="text" id="startPosition" class="form-control" readonly>
                                         </div>
                                         <div class="mb-3 mt-4">
-                                            <label for="bank">Chọn loại ngân hàng bạn muốn tìm:</label>
-                                            <select class="form-select mt-2" name="bank_types" id="bank_types" onchange="bankChanged(this)">
+                                            <label for="bank">Chọn nhãn ngân hàng bạn muốn tìm:</label>
+                                            <select class="form-select mt-2" name="bank_types" id="bank_types">
                                                 <?php
                                                 include('./includes/bank_types.php');
                                                 ?>
                                             </select>
                                         </div>
                                         <div class="search-btn d-flex justify-content-around mb-4">
-                                            <button class="btn btn-primary" id="btnSolve">Tìm kiếm</button>
+                                            <button class="btn btn-primary" id="btnFind">Tìm kiếm</button>
                                             <button class="btn btn-danger" id="btnReset">Đặt lại</button>
                                         </div>
                                         <div>
                                             <div>
-                                                <div class="">
-                                                    <h2 class="text-center">Thông tin của ngân hàng</h2>
-                                                    <div class="info-bank-content">
+                                                <div>
+                                                    <h2 class="text-center mb-4">Thông tin của ngân hàng</h2>
+                                                    <div id="bank_infor">
                                                     </div>
                                                 </div>
 
