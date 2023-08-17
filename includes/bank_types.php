@@ -19,13 +19,13 @@ try {
     throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
 // Query
-$result = $myPdo->query("SELECT DISTINCT CASE WHEN brand IS NULL THEN 'Các nhãn ngân hàng chưa rõ' ELSE brand END FROM hanoi_bank_point");
+$result = $myPdo->query("SELECT DISTINCT CASE WHEN brand IS NULL THEN 'Các ngân hàng chưa rõ nhãn' ELSE brand END FROM hanoi_bank_point");
 
 // Loop query
 $resFin =  '<option value="">Chọn nhãn ngân hàng</option>';
 foreach ($result as $key => $row) {
     $name = $row['brand'];
-    $value = $row['brand'] == 'Các nhãn ngân hàng chưa rõ' ? "others" : $row['brand'];
+    $value = $row['brand'] == 'Các ngân hàng chưa rõ nhãn' ? "others" : $row['brand'];
 
     $resFin = $resFin . '<option value = "' . $value  . '">' . $name . '</option>';
 }

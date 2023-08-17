@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css" />
     <script src="https://openlayers.org/en/v4.6.5/build/ol.js" type="text/javascript"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js" type="text/javascript"></script>
-    <link rel="shortcut icon" href="./logo.png" type="image/x-icon">
+    <link rel="shortcut icon" href="./assets/images/logo.png" type="image/x-icon">
 </head>
 
 <body onload="initialize_map();">
@@ -39,11 +39,11 @@
                                     <div style="margin-top:150px;">
                                         <div class="mb-3">
                                             <p class="d-inline">Vị trí đang ở: </p>
-                                            <img src="./start.png" alt="Start">
+                                            <img src="./assets/images/start.png" alt="Start">
                                         </div>
                                         <div class="mb-3">
                                             <p class="d-inline">Ngân hàng gần nhất: </p>
-                                            <img src="./destination.png" alt="Destination">
+                                            <img src="./assets/images/destination.png" alt="Destination">
                                         </div>
                                         <div class="mb-3">
                                             <label for="startPosition" class="form-label">Click chuột lên bản đồ để chọn vị trí bạn đang ở: </label>
