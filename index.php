@@ -20,7 +20,7 @@
         <header id="header" class="header bg-primary p-3">
             <div class="container">
                 <h2 class="text-center text-light text-uppercase">Bài tập lớn môn Hệ Thống Thông Tin Địa Lý</h2>
-                <h2 class="text-center text-light text-uppercase">Đề tài: Web tìm ngân hàng gần nhất trong thành phố Hà Nội</h2>
+                <h2 class="text-center text-light text-uppercase">Đề tài: Web tìm đường đến ngân hàng gần nhất trong thành phố Hà Nội</h2>
             </div>
         </header>
         <div>
@@ -36,14 +36,18 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 border border-1 rounded ">
-                                    <div style="margin-top:150px;">
-                                        <div class="mb-3">
+                                    <div style="margin-top: 150px;">
+                                        <div class="mb-2">
                                             <p class="d-inline">Vị trí đang ở: </p>
                                             <img src="./assets/images/start.png" alt="Start">
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="mb-2">
                                             <p class="d-inline">Ngân hàng gần nhất: </p>
                                             <img src="./assets/images/destination.png" alt="Destination">
+                                        </div>
+                                        <div class="mb-3">
+                                            <p class="d-inline">Đường đi ngắn nhất: </p>
+                                            <img src="./assets/images/line.png" alt="Line">
                                         </div>
                                         <div class="mb-3">
                                             <label for="startPosition" class="form-label">Click chuột lên bản đồ để chọn vị trí bạn đang ở: </label>
