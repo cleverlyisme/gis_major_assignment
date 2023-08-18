@@ -10,7 +10,10 @@ var mapLat = cenY;
 var mapLng = cenX;
 var mapDefaultZoom = 12;
 var startPoint = null;
+var startCoords,
+  bankCoords = null;
 var startPointFeature = null;
+var apiKey = "5b3ce3597851110001cf6248c473d3c0bee443b98e12e3031e01d524";
 
 function initialize_map() {
   layerBG = new ol.layer.Tile({
@@ -135,12 +138,46 @@ function initialize_map() {
     highLightGeoJsonObj(objJson);
   }
 
+  function calculateAndHighlightRoute(startCoords, bankCoords) {
+    var routingUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.join(
+      ","
+    )}&end=${bankCoords.join(",")}`;
+
+    $.get(routingUrl, function (data) {
+      var routeGeometry = data.features[0].geometry.coordinates;
+      highlightRoute(routeGeometry);
+    });
+  }
+
+  function highlightRoute(routeCoordinates) {
+    var routeGeometry = new ol.geom.LineString(
+      routeCoordinates.map(function (coord) {
+        return ol.proj.fromLonLat(coord);
+      })
+    );
+
+    var routeFeature = new ol.Feature({
+      geometry: routeGeometry,
+    });
+
+    var routeStyle = new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: "green",
+        width: 4,
+      }),
+    });
+
+    routeFeature.setStyle(routeStyle);
+    vectorSource.addFeature(routeFeature);
+  }
+
   map.on("click", function (evt) {
     if (!startPointFeature) {
       var point = ol.proj.transform(evt.coordinate, "EPSG:3857", "EPSG:4326");
       var x = point[0];
       var y = point[1];
       startPoint = "POINT(" + x + " " + y + ")";
+      startCoords = [x, y];
 
       $("#startPosition").val(x + "; " + y);
 
@@ -172,6 +209,7 @@ function initialize_map() {
         },
         success: function (result, status, xhr) {
           var bank = JSON.parse(result)[0];
+          bankCoords = JSON.parse(bank.geo).coordinates;
           highLightObj(bank.geo);
 
           var id =
@@ -202,6 +240,8 @@ function initialize_map() {
             "<dl class='row'>" + id + type + name + street + distance + "</dl>";
 
           $("#bank_infor").html(html);
+
+          calculateAndHighlightRoute(startCoords, bankCoords);
         },
         error: function (xhr, status, error) {
           alert(xhr.responseText + " " + status + " " + error);
