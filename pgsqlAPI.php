@@ -7,10 +7,8 @@ if (isset($_POST['functionname'])) {
     $functionname = $_POST['functionname'];
 
     $aResult = "null";
-    if ($functionname == 'getGeoCMRToAjax')
-        $aResult = getGeoCMRToAjax($paPDO, $paSRID, $paPoint, $bank_type);
-    else if ($functionname == 'getInfoCMRToAjax')
-        $aResult = getInfoCMRToAjax($paPDO, $paSRID, $paPoint, $bank_type);
+    if ($functionname == 'getBankInfor')
+        $aResult = getBankInfor($paPDO, $paSRID, $paPoint, $bank_type);
 
     echo $aResult;
 
@@ -53,40 +51,14 @@ function closeDB($paPDO)
     $paPDO = null;
 }
 
-function getGeoCMRToAjax($paPDO, $paSRID, $paPoint, $bank_type)
+function getBankInfor($paPDO, $paSRID, $paPoint, $bank_type)
 {
     $paPoint = str_replace(',', ' ', $paPoint);
     if ($bank_type == "others")
-        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo, 
-    ST_Distance('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)
-    as distance FROM \"hanoi_bank_point\" WHERE brand IS NULL ORDER BY distance LIMIT 1";
+        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo, osm_id as id, brand, name, addr_stree as street, ST_Distance('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom) as distance FROM \"hanoi_bank_point\" 
+        WHERE brand IS NULL ORDER BY distance LIMIT 1";
     else
-        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo, 
-    ST_Distance('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)
-    as distance FROM \"hanoi_bank_point\" WHERE brand='" . $bank_type .
-            "' ORDER BY distance LIMIT 1";
-    $result = query($paPDO, $mySQLStr);
-
-    if ($result != null) {
-        foreach ($result as $item) {
-            return $item['geo'];
-        }
-    } else
-        return "null";
-}
-
-function getInfoCMRToAjax($paPDO, $paSRID, $paPoint, $bank_type)
-{
-    $paPoint = str_replace(',', ' ', $paPoint);
-    if ($bank_type == "others")
-        $mySQLStr = "SELECT osm_id as id, brand, name, addr_stree as street, 
-    ST_Distance('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)
-    as distance FROM \"hanoi_bank_point\" WHERE brand IS NULL ORDER BY distance LIMIT 1";
-    else
-        $mySQLStr = "SELECT  osm_id as id, brand, name, addr_stree as street, 
-    ST_Distance('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)
-    as distance FROM \"hanoi_bank_point\" WHERE brand='" . $bank_type .
-            "' ORDER BY distance LIMIT 1";
+        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo, osm_id as id, brand, name, addr_stree as street, ST_Distance('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom) as distance FROM \"hanoi_bank_point\" WHERE brand='" . $bank_type . "' ORDER BY distance LIMIT 1";
     $result = query($paPDO, $mySQLStr);
 
     if ($result != null) {

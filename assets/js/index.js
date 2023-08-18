@@ -57,7 +57,7 @@ function initialize_map() {
 
   var startStyle = new ol.style.Style({
     image: new ol.style.Circle({
-      radius: 8,
+      radius: 6,
       fill: new ol.style.Fill({
         color: "transparent",
       }),
@@ -71,7 +71,7 @@ function initialize_map() {
   var desStyle = {
     Point: new ol.style.Style({
       image: new ol.style.Circle({
-        radius: 8,
+        radius: 6,
         fill: new ol.style.Fill({
           color: "transparent",
         }),
@@ -166,53 +166,42 @@ function initialize_map() {
         type: "POST",
         url: "pgsqlAPI.php",
         data: {
-          functionname: "getGeoCMRToAjax",
+          functionname: "getBankInfor",
           paPoint: startPoint,
           bank_type: bank_type,
         },
         success: function (result, status, xhr) {
-          highLightObj(result);
+          var bank = JSON.parse(result)[0];
+          highLightObj(bank.geo);
 
-          $.ajax({
-            type: "POST",
-            url: "pgsqlAPI.php",
-            data: {
-              functionname: "getInfoCMRToAjax",
-              paPoint: startPoint,
-              bank_type: bank_type,
-            },
-            success: function (result, status, error) {
-              var bank = JSON.parse(result)[0];
+          var id =
+            "<dt class='col-sm-5'>ID ngân hàng: </dt><dd class='col-sm-7'>" +
+            bank.id +
+            "</dd>";
+          var type = bank.brand
+            ? "<dt class='col-sm-5'>Nhãn ngân hàng: </dt><dd class='col-sm-7'>" +
+              bank.brand +
+              "</dd>"
+            : "";
+          var name = bank.name
+            ? "<dt class='col-sm-5'>Tên ngân hàng: </dt><dd class='col-sm-7'>" +
+              bank.name +
+              "</dd>"
+            : "";
+          var street = bank.street
+            ? "<dt class='col-sm-5'>Địa chỉ: </dt><dd class='col-sm-7'>" +
+              bank.street +
+              "</dd>"
+            : "";
+          var distance =
+            "<dt class='col-sm-5'>Khoảng cách: </dt><dd class='col-sm-7'>" +
+            (Number(bank.distance) * 150).toFixed(3) +
+            "km</dd>";
 
-              var id =
-                "<dt class='col-sm-5'>ID ngân hàng: </dt><dd class='col-sm-7'>" +
-                bank.id +
-                "</dd>";
-              var type = bank.brand
-                ? "<dt class='col-sm-5'>Nhãn ngân hàng: </dt><dd class='col-sm-7'>" +
-                  bank.brand +
-                  "</dd>"
-                : "";
-              var name = bank.name
-                ? "<dt class='col-sm-5'>Tên ngân hàng: </dt><dd class='col-sm-7'>" +
-                  bank.name +
-                  "</dd>"
-                : "";
-              var street = bank.street
-                ? "<dt class='col-sm-5'>Địa chỉ: </dt><dd class='col-sm-7'>" +
-                  bank.street +
-                  "</dd>"
-                : "";
+          var html =
+            "<dl class='row'>" + id + type + name + street + distance + "</dl>";
 
-              var html =
-                "<dl class='row'>" + id + type + name + street + "</dl>";
-
-              $("#bank_infor").html(html);
-            },
-            error: function (req, status, error) {
-              alert(req + " " + status + " " + error);
-            },
-          });
+          $("#bank_infor").html(html);
         },
         error: function (xhr, status, error) {
           alert(xhr.responseText + " " + status + " " + error);
