@@ -9,10 +9,11 @@ var cenY = (minY + maxY) / 2;
 var mapLat = cenY;
 var mapLng = cenX;
 var mapDefaultZoom = 12;
-var startPoint = null;
-var startCoords,
-  bankCoords = null;
-var startPointFeature = null;
+var startPoint = null,
+  startPointFeature = null;
+var startCoords = null,
+  bankCoords = null,
+  distanceFromStartToBank = null;
 var apiKey = "5b3ce3597851110001cf6248c473d3c0bee443b98e12e3031e01d524";
 
 function initialize_map() {
@@ -138,15 +139,33 @@ function initialize_map() {
     highLightGeoJsonObj(objJson);
   }
 
-  function calculateAndHighlightRoute(startCoords, bankCoords) {
+  async function calculateAndHighlightRoute(startCoords, bankCoords) {
     var routingUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.join(
       ","
     )}&end=${bankCoords.join(",")}`;
 
-    $.get(routingUrl, function (data) {
+    try {
+      const response = await fetch(routingUrl);
+      if (!response.ok) {
+        throw new Error(
+          `Network response was not ok (${response.status} ${response.statusText})`
+        );
+      }
+
+      const data = await response.json();
+      if (!data || !data.features || data.features.length === 0) {
+        throw new Error("Invalid response format");
+      }
+
+      distanceFromStartToBank = (
+        Number(data.features[0].properties.summary.distance) / 1000
+      ).toFixed(3);
       var routeGeometry = data.features[0].geometry.coordinates;
+
       highlightRoute(routeGeometry);
-    });
+    } catch (error) {
+      console.error("Error fetching route data:", error);
+    }
   }
 
   function highlightRoute(routeCoordinates) {
@@ -208,40 +227,50 @@ function initialize_map() {
           bank_type: bank_type,
         },
         success: function (result, status, xhr) {
-          var bank = JSON.parse(result)[0];
-          bankCoords = JSON.parse(bank.geo).coordinates;
-          highLightObj(bank.geo);
+          async function highLightAndShowRoute(result) {
+            var bank = JSON.parse(result)[0];
+            bankCoords = JSON.parse(bank.geo).coordinates;
 
-          var id =
-            "<dt class='col-sm-5'>ID ngân hàng: </dt><dd class='col-sm-7'>" +
-            bank.id +
-            "</dd>";
-          var type = bank.brand
-            ? "<dt class='col-sm-5'>Nhãn ngân hàng: </dt><dd class='col-sm-7'>" +
-              bank.brand +
-              "</dd>"
-            : "";
-          var name = bank.name
-            ? "<dt class='col-sm-5'>Tên ngân hàng: </dt><dd class='col-sm-7'>" +
-              bank.name +
-              "</dd>"
-            : "";
-          var street = bank.street
-            ? "<dt class='col-sm-5'>Địa chỉ: </dt><dd class='col-sm-7'>" +
-              bank.street +
-              "</dd>"
-            : "";
-          var distance =
-            "<dt class='col-sm-5'>Khoảng cách: </dt><dd class='col-sm-7'>" +
-            (Number(bank.distance) * 150).toFixed(3) +
-            "km</dd>";
+            highLightObj(bank.geo);
+            await calculateAndHighlightRoute(startCoords, bankCoords);
 
-          var html =
-            "<dl class='row'>" + id + type + name + street + distance + "</dl>";
+            var id =
+              "<dt class='col-sm-5'>ID ngân hàng: </dt><dd class='col-sm-7'>" +
+              bank.id +
+              "</dd>";
+            var type = bank.brand
+              ? "<dt class='col-sm-5'>Nhãn ngân hàng: </dt><dd class='col-sm-7'>" +
+                bank.brand +
+                "</dd>"
+              : "";
+            var name = bank.name
+              ? "<dt class='col-sm-5'>Tên ngân hàng: </dt><dd class='col-sm-7'>" +
+                bank.name +
+                "</dd>"
+              : "";
+            var street = bank.street
+              ? "<dt class='col-sm-5'>Địa chỉ: </dt><dd class='col-sm-7'>" +
+                bank.street +
+                "</dd>"
+              : "";
+            var distance =
+              "<dt class='col-sm-5'>Khoảng cách: </dt><dd class='col-sm-7'>" +
+              distanceFromStartToBank +
+              "km</dd>";
 
-          $("#bank_infor").html(html);
+            var html =
+              "<dl class='row'>" +
+              id +
+              type +
+              name +
+              street +
+              distance +
+              "</dl>";
 
-          calculateAndHighlightRoute(startCoords, bankCoords);
+            $("#bank_infor").html(html);
+          }
+
+          highLightAndShowRoute(result);
         },
         error: function (xhr, status, error) {
           alert(xhr.responseText + " " + status + " " + error);
