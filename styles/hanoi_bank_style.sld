@@ -6,17 +6,18 @@
       <se:Name>hanoi_bank_point</se:Name>
       <se:FeatureTypeStyle>
         <se:Rule>
-          <se:Name>Single symbol</se:Name>
-          <se:PolygonSymbolizer>
-            <se:Fill>
-              <se:SvgParameter name="fill">#729b6f</se:SvgParameter>
-            </se:Fill>
-            <se:Stroke>
-              <se:SvgParameter name="stroke">#232323</se:SvgParameter>
-              <se:SvgParameter name="stroke-width">1</se:SvgParameter>
-              <se:SvgParameter name="stroke-linejoin">bevel</se:SvgParameter>
-            </se:Stroke>
-          </se:PolygonSymbolizer>
+          <se:Name>Colored Point</se:Name>
+          <se:PointSymbolizer>
+            <se:Graphic>
+              <se:Mark>
+                <se:WellKnownName>circle</se:WellKnownName>
+                <se:Fill>
+                  <se:CssParameter name="fill">#FFFFFF</se:CssParameter>
+                </se:Fill>
+              </se:Mark>
+              <se:Size>6</se:Size>
+            </se:Graphic>
+          </se:PointSymbolizer>
         </se:Rule>
       </se:FeatureTypeStyle>
     </UserStyle>

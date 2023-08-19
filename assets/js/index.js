@@ -27,7 +27,7 @@ function initialize_map() {
       params: {
         FORMAT: format,
         VERSION: "1.1.1",
-        STYLES: "hanoi_route_style_route",
+        STYLES: "hanoi_route_style",
         LAYERS: "hanoi_route_map",
       },
     }),
@@ -53,7 +53,7 @@ function initialize_map() {
       params: {
         FORMAT: format,
         VERSION: "1.1.1",
-        STYLES: "hanoi_boundary_style.sld",
+        STYLES: "hanoi_boundary_style",
         LAYERS: "hanoi_boundary",
       },
     }),
@@ -62,7 +62,7 @@ function initialize_map() {
   var viewMap = new ol.View({
     center: ol.proj.fromLonLat([mapLng, mapLat]),
     zoom: mapDefaultZoom,
-    minZoom: mapDefaultZoom,
+    minZoom: mapDefaultZoom - 2,
   });
 
   map = new ol.Map({
@@ -78,7 +78,7 @@ function initialize_map() {
         color: "transparent",
       }),
       stroke: new ol.style.Stroke({
-        color: "green",
+        color: "yellow",
         width: 2,
       }),
     }),
