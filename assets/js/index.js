@@ -194,6 +194,8 @@ function initialize_map() {
 
             highLightObj(bank.geo);
 
+            map.removeLayer(routeFound);
+
             routeFound = new ol.layer.Image({
               source: new ol.source.ImageWMS({
                 url: "http://localhost:8000/geoserver/major_assignment/wms?",
