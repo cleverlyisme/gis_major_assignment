@@ -10,15 +10,27 @@ var mapLat = cenY;
 var mapLng = cenX;
 var mapDefaultZoom = 12;
 var startPoint = null,
-  startPointFeature = null;
-var startCoords = null,
+  startPointFeature = null,
+  startCoords = null,
   bankCoords = null,
-  distanceFromStartToBank = null;
-var apiKey = "5b3ce3597851110001cf6248c473d3c0bee443b98e12e3031e01d524";
+  routeFound;
 
 function initialize_map() {
   layerBG = new ol.layer.Tile({
     source: new ol.source.OSM({}),
+  });
+
+  //Các đường đi thành phố Hà Nội
+  var hanoi_route = new ol.layer.Image({
+    source: new ol.source.ImageWMS({
+      url: "http://localhost:8000/geoserver/major_assignment/wms?",
+      params: {
+        FORMAT: format,
+        VERSION: "1.1.1",
+        STYLES: "hanoi_route_style_route",
+        LAYERS: "hanoi_route_map",
+      },
+    }),
   });
 
   //Các ngân hàng thành phố Hà Nội
@@ -41,7 +53,7 @@ function initialize_map() {
       params: {
         FORMAT: format,
         VERSION: "1.1.1",
-        STYLES: "hanoi_boundary_style",
+        STYLES: "hanoi_boundary_style.sld",
         LAYERS: "hanoi_boundary",
       },
     }),
@@ -55,7 +67,7 @@ function initialize_map() {
 
   map = new ol.Map({
     target: "map",
-    layers: [layerBG, hanoi_boundary, hanoi_bank],
+    layers: [layerBG, hanoi_route, hanoi_boundary, hanoi_bank],
     view: viewMap,
   });
 
@@ -66,7 +78,7 @@ function initialize_map() {
         color: "transparent",
       }),
       stroke: new ol.style.Stroke({
-        color: "blue",
+        color: "green",
         width: 2,
       }),
     }),
@@ -139,57 +151,6 @@ function initialize_map() {
     highLightGeoJsonObj(objJson);
   }
 
-  async function calculateAndHighlightRoute(startCoords, bankCoords) {
-    var routingUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.join(
-      ","
-    )}&end=${bankCoords.join(",")}`;
-
-    try {
-      const response = await fetch(routingUrl);
-      if (!response.ok) {
-        throw new Error(
-          `Network response was not ok (${response.status} ${response.statusText})`
-        );
-      }
-
-      const data = await response.json();
-      if (!data || !data.features || data.features.length === 0) {
-        throw new Error("Invalid response format");
-      }
-
-      distanceFromStartToBank = (
-        Number(data.features[0].properties.summary.distance) / 1000
-      ).toFixed(3);
-      var routeGeometry = data.features[0].geometry.coordinates;
-
-      highlightRoute(routeGeometry);
-    } catch (error) {
-      console.error("Error fetching route data:", error);
-    }
-  }
-
-  function highlightRoute(routeCoordinates) {
-    var routeGeometry = new ol.geom.LineString(
-      routeCoordinates.map(function (coord) {
-        return ol.proj.fromLonLat(coord);
-      })
-    );
-
-    var routeFeature = new ol.Feature({
-      geometry: routeGeometry,
-    });
-
-    var routeStyle = new ol.style.Style({
-      stroke: new ol.style.Stroke({
-        color: "green",
-        width: 4,
-      }),
-    });
-
-    routeFeature.setStyle(routeStyle);
-    vectorSource.addFeature(routeFeature);
-  }
-
   map.on("click", function (evt) {
     if (!startPointFeature) {
       var point = ol.proj.transform(evt.coordinate, "EPSG:3857", "EPSG:4326");
@@ -232,7 +193,19 @@ function initialize_map() {
             bankCoords = JSON.parse(bank.geo).coordinates;
 
             highLightObj(bank.geo);
-            await calculateAndHighlightRoute(startCoords, bankCoords);
+
+            routeFound = new ol.layer.Image({
+              source: new ol.source.ImageWMS({
+                url: "http://localhost:8000/geoserver/major_assignment/wms?",
+                params: {
+                  VIEWPARAMS: `x1:${startCoords[0]};y1:${startCoords[1]};x2:${bankCoords[0]};y2:${bankCoords[1]}`,
+                  LAYERS: "major_assignment:route",
+                  FORMAT: "image/png",
+                },
+              }),
+            });
+
+            map.addLayer(routeFound);
 
             var id =
               "<dt class='col-sm-5'>ID ngân hàng: </dt><dd class='col-sm-7'>" +
@@ -255,7 +228,7 @@ function initialize_map() {
               : "";
             var distance =
               "<dt class='col-sm-5'>Khoảng cách: </dt><dd class='col-sm-7'>" +
-              distanceFromStartToBank +
+              (bank.distance * 120).toFixed(3) +
               "km</dd>";
 
             var html =
@@ -282,10 +255,10 @@ function initialize_map() {
   $("#btnReset").on("click", function () {
     startPoint = null;
     startPointFeature = null;
+    map.removeLayer(routeFound);
+    vectorSource.clear();
     $("#startPosition").val(null);
     $("#bank_types").val(null);
-
-    vectorSource.clear();
     $("#bank_infor").html("");
   });
 }
