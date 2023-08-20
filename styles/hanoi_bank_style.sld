@@ -1,25 +1,30 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<StyledLayerDescriptor xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:se="http://www.opengis.net/se" version="1.1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/StyledLayerDescriptor.xsd">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<StyledLayerDescriptor version="1.0.0"
+  xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd"
+  xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
   <NamedLayer>
-    <se:Name>hanoi_bank_point</se:Name>
+    <Name>hanoi_bank_style</Name>
     <UserStyle>
-      <se:Name>hanoi_bank_point</se:Name>
-      <se:FeatureTypeStyle>
-        <se:Rule>
-          <se:Name>Colored Point</se:Name>
-          <se:PointSymbolizer>
-            <se:Graphic>
-              <se:Mark>
-                <se:WellKnownName>circle</se:WellKnownName>
-                <se:Fill>
-                  <se:CssParameter name="fill">#FFFFFF</se:CssParameter>
-                </se:Fill>
-              </se:Mark>
-              <se:Size>6</se:Size>
-            </se:Graphic>
-          </se:PointSymbolizer>
-        </se:Rule>
-      </se:FeatureTypeStyle>
+      <Title>hanoi_bank_style</Title>
+      <FeatureTypeStyle>
+        <Rule>
+          <Title>color point</Title>
+          <PointSymbolizer>
+            <Graphic>
+              <Mark>
+                <WellKnownName>square</WellKnownName>
+                <Fill>
+                  <CssParameter name="fill">#DB7093</CssParameter>
+                </Fill>
+              </Mark>
+              <Size>6</Size>
+            </Graphic>
+          </PointSymbolizer>
+        </Rule>
+
+      </FeatureTypeStyle>
     </UserStyle>
   </NamedLayer>
 </StyledLayerDescriptor>

@@ -76,8 +76,8 @@ function getBankInfor($paPDO, $paSRID, $paPoint, $bank_type)
 
 function getRouteFound($paPDO, $x1, $y1, $x2, $y2)
 {
-    $mySQLStr = "SELECT (route.geom) FROM (
-        SELECT geom FROM pgr_fromAtoB('hanoi_route', " . $x1 . ", " . $y1 . ", " . $x2 . ", " . $y2 . "
+    $mySQLStr = "SELECT ST_AsGeoJson(route.geom) as geo, cost FROM (
+        SELECT geom, cost FROM pgr_fromAtoB('hanoi_route', " . $x1 . ", " . $y1 . ", " . $x2 . ", " . $y2 . "
         ) ORDER BY seq) AS route";
     $result = query($paPDO, $mySQLStr);
 

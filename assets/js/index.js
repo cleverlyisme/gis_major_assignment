@@ -1,6 +1,6 @@
 var format = "image/png";
 var map, vectorSource;
-var minX = 105.61895568847656;
+var minX = 105.45895568847656;
 var minY = 20.68451416015625;
 var maxX = 106.02007293701172;
 var maxY = 21.385278701782227;
@@ -151,6 +151,28 @@ function initialize_map() {
     highLightGeoJsonObj(objJson);
   }
 
+  function highlightRoute(routeCoordinates) {
+    var routeGeometry = new ol.geom.LineString(
+      routeCoordinates.map(function (coord) {
+        return ol.proj.fromLonLat(coord);
+      })
+    );
+
+    var routeFeature = new ol.Feature({
+      geometry: routeGeometry,
+    });
+
+    var routeStyle = new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: "blue",
+        width: 4,
+      }),
+    });
+
+    routeFeature.setStyle(routeStyle);
+    vectorSource.addFeature(routeFeature);
+  }
+
   map.on("click", function (evt) {
     if (!startPointFeature) {
       var point = ol.proj.transform(evt.coordinate, "EPSG:3857", "EPSG:4326");
@@ -189,60 +211,83 @@ function initialize_map() {
         },
         success: function (result, status, xhr) {
           async function highLightAndShowRoute(result) {
-            var bank = JSON.parse(result)[0];
-            bankCoords = JSON.parse(bank.geo).coordinates;
+            var bank = await JSON.parse(result)[0];
+            bankCoords = await JSON.parse(bank.geo).coordinates;
 
-            // highLightObj(bank.geo);
+            highLightObj(bank.geo);
 
-            map.removeLayer(routeFound);
+            $.ajax({
+              type: "POST",
+              url: "pgsqlAPI.php",
+              data: {
+                functionname: "getRouteFound",
+                x1: startCoords[0],
+                y1: startCoords[1],
+                x2: bankCoords[0],
+                y2: bankCoords[1],
+              },
+              success: function (result, status, xhr) {
+                async function highLightAndShowRoute(result) {
+                  var routeFound = await JSON.parse(result);
 
-            routeFound = new ol.layer.Image({
-              source: new ol.source.ImageWMS({
-                url: "http://localhost:8000/geoserver/major_assignment/wms?",
-                params: {
-                  VIEWPARAMS: `x1:${startCoords[0]};y1:${startCoords[1]};x2:${bankCoords[0]};y2:${bankCoords[1]}`,
-                  LAYERS: "major_assignment:route",
-                  FORMAT: "image/png",
-                },
-              }),
+                  var distanceFromStartToBank = 0;
+
+                  if (routeFound.length > 0) {
+                    var routeCoordinates = routeFound.map((item) => {
+                      var geoJSON = JSON.parse(item.geo);
+                      distanceFromStartToBank += Number(JSON.parse(item.cost));
+                      var coordinates = geoJSON.coordinates.flat();
+
+                      return coordinates;
+                    });
+
+                    var flatRouteCoordinates = routeCoordinates.flat();
+
+                    highlightRoute(flatRouteCoordinates);
+
+                    var id =
+                      "<dt class='col-sm-5'>ID ngân hàng: </dt><dd class='col-sm-7'>" +
+                      bank.id +
+                      "</dd>";
+                    var type = bank.brand
+                      ? "<dt class='col-sm-5'>Nhãn ngân hàng: </dt><dd class='col-sm-7'>" +
+                        bank.brand +
+                        "</dd>"
+                      : "";
+                    var name = bank.name
+                      ? "<dt class='col-sm-5'>Tên ngân hàng: </dt><dd class='col-sm-7'>" +
+                        bank.name +
+                        "</dd>"
+                      : "";
+                    var street = bank.street
+                      ? "<dt class='col-sm-5'>Địa chỉ: </dt><dd class='col-sm-7'>" +
+                        bank.street +
+                        "</dd>"
+                      : "";
+                    var distance =
+                      "<dt class='col-sm-5'>Khoảng cách: </dt><dd class='col-sm-7'>" +
+                      (distanceFromStartToBank * 120).toFixed(3) +
+                      "km</dd>";
+
+                    var html =
+                      "<dl class='row'>" +
+                      id +
+                      type +
+                      name +
+                      street +
+                      distance +
+                      "</dl>";
+
+                    $("#bank_infor").html(html);
+                  }
+                }
+
+                highLightAndShowRoute(result);
+              },
+              error: function (xhr, status, error) {
+                alert(xhr.responseText + " " + status + " " + error);
+              },
             });
-
-            map.addLayer(routeFound);
-
-            var id =
-              "<dt class='col-sm-5'>ID ngân hàng: </dt><dd class='col-sm-7'>" +
-              bank.id +
-              "</dd>";
-            var type = bank.brand
-              ? "<dt class='col-sm-5'>Nhãn ngân hàng: </dt><dd class='col-sm-7'>" +
-                bank.brand +
-                "</dd>"
-              : "";
-            var name = bank.name
-              ? "<dt class='col-sm-5'>Tên ngân hàng: </dt><dd class='col-sm-7'>" +
-                bank.name +
-                "</dd>"
-              : "";
-            var street = bank.street
-              ? "<dt class='col-sm-5'>Địa chỉ: </dt><dd class='col-sm-7'>" +
-                bank.street +
-                "</dd>"
-              : "";
-            var distance =
-              "<dt class='col-sm-5'>Khoảng cách: </dt><dd class='col-sm-7'>" +
-              (bank.distance * 120).toFixed(3) +
-              "km</dd>";
-
-            var html =
-              "<dl class='row'>" +
-              id +
-              type +
-              name +
-              street +
-              distance +
-              "</dl>";
-
-            $("#bank_infor").html(html);
           }
 
           highLightAndShowRoute(result);
