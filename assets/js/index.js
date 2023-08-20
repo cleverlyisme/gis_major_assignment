@@ -192,7 +192,7 @@ function initialize_map() {
             var bank = JSON.parse(result)[0];
             bankCoords = JSON.parse(bank.geo).coordinates;
 
-            highLightObj(bank.geo);
+            // highLightObj(bank.geo);
 
             map.removeLayer(routeFound);
 
