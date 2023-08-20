@@ -1,7 +1,7 @@
 var format = "image/png";
 var map, vectorSource;
 var minX = 105.45895568847656;
-var minY = 20.68451416015625;
+var minY = 20.58451416015625;
 var maxX = 106.02007293701172;
 var maxY = 21.385278701782227;
 var cenX = (minX + maxX) / 2;
