@@ -3,11 +3,6 @@ alter table public.hanoi_route add column source integer;
 
 select pgr_createTopology('public.hanoi_route', 0.0001, 'geom', 'gid');
 
-SELECT seq, node, edge, cost, geom FROM pgr_dijkstra('SELECT gid as id, source, target, 
-st_length(geom) as cost FROM public.hanoi_route', 1, 3000, false) as di
-JOIN public.hanoi_route pt
-ON di.edge = pt.gid;
-
 CREATE OR REPLACE FUNCTION pgr_fromAtoB(
 IN tbl varchar,
 IN x1 double precision,
@@ -39,7 +34,7 @@ EXECUTE 'SELECT id::integer FROM hanoi_route_vertices_pgr
 ORDER BY the_geom <-> ST_GeometryFromText(''POINT('
 || x2 || ' ' || y2 || ')'',4326) LIMIT 1' INTO rec;
 target := rec.id;
--- Shortest path query (TODO: limit extent by BBOX)
+-- Shortest path query
 seq := 0;
 sql := 'SELECT gid, geom, name, cost, source, target,
 ST_Reverse(geom) AS flip_geom FROM ' ||
@@ -77,6 +72,11 @@ RETURN;
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE STRICT;
+
+SELECT seq, node, edge, cost, geom FROM pgr_dijkstra('SELECT gid as id, source, target, 
+st_length(geom) as cost FROM public.hanoi_route', 1, 3000, false) as di
+JOIN public.hanoi_route pt
+ON di.edge = pt.gid;
 
 SELECT (route.geom) FROM (
 SELECT geom FROM pgr_fromAtoB('hanoi_route', 1, 0, 3, 4

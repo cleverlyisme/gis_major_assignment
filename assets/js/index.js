@@ -232,11 +232,11 @@ function initialize_map() {
 
                   var distanceFromStartToBank = 0;
 
-                  if (routeFound.length > 0) {
+                  if (routeFound) {
                     var routeCoordinates = routeFound.map((item) => {
-                      var geoJSON = JSON.parse(item.geo);
+                      var routeGeo = JSON.parse(item.geo);
                       distanceFromStartToBank += Number(JSON.parse(item.cost));
-                      var coordinates = geoJSON.coordinates.flat();
+                      var coordinates = routeGeo.coordinates.flat();
 
                       return coordinates;
                     });
@@ -244,42 +244,42 @@ function initialize_map() {
                     var flatRouteCoordinates = routeCoordinates.flat();
 
                     highlightRoute(flatRouteCoordinates);
-
-                    var id =
-                      "<dt class='col-sm-5'>ID ngân hàng: </dt><dd class='col-sm-7'>" +
-                      bank.id +
-                      "</dd>";
-                    var type = bank.brand
-                      ? "<dt class='col-sm-5'>Nhãn ngân hàng: </dt><dd class='col-sm-7'>" +
-                        bank.brand +
-                        "</dd>"
-                      : "";
-                    var name = bank.name
-                      ? "<dt class='col-sm-5'>Tên ngân hàng: </dt><dd class='col-sm-7'>" +
-                        bank.name +
-                        "</dd>"
-                      : "";
-                    var street = bank.street
-                      ? "<dt class='col-sm-5'>Địa chỉ: </dt><dd class='col-sm-7'>" +
-                        bank.street +
-                        "</dd>"
-                      : "";
-                    var distance =
-                      "<dt class='col-sm-5'>Khoảng cách: </dt><dd class='col-sm-7'>" +
-                      (distanceFromStartToBank * 120).toFixed(3) +
-                      "km</dd>";
-
-                    var html =
-                      "<dl class='row'>" +
-                      id +
-                      type +
-                      name +
-                      street +
-                      distance +
-                      "</dl>";
-
-                    $("#bank_infor").html(html);
                   }
+
+                  var id =
+                    "<dt class='col-sm-5'>ID ngân hàng: </dt><dd class='col-sm-7'>" +
+                    bank.id +
+                    "</dd>";
+                  var type = bank.brand
+                    ? "<dt class='col-sm-5'>Nhãn ngân hàng: </dt><dd class='col-sm-7'>" +
+                      bank.brand +
+                      "</dd>"
+                    : "";
+                  var name = bank.name
+                    ? "<dt class='col-sm-5'>Tên ngân hàng: </dt><dd class='col-sm-7'>" +
+                      bank.name +
+                      "</dd>"
+                    : "";
+                  var street = bank.street
+                    ? "<dt class='col-sm-5'>Địa chỉ: </dt><dd class='col-sm-7'>" +
+                      bank.street +
+                      "</dd>"
+                    : "";
+                  var distance =
+                    "<dt class='col-sm-5'>Khoảng cách: </dt><dd class='col-sm-7'>" +
+                    (distanceFromStartToBank * 120).toFixed(3) +
+                    "km</dd>";
+
+                  var html =
+                    "<dl class='row'>" +
+                    id +
+                    type +
+                    name +
+                    street +
+                    distance +
+                    "</dl>";
+
+                  $("#bank_infor").html(html);
                 }
 
                 highLightAndShowRoute(result);
